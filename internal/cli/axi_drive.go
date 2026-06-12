@@ -596,6 +596,9 @@ func resolveActiveRun(env *axiEnv, runID, branch string) (*db.Run, error) {
 		if run == nil {
 			return nil, fmt.Errorf("run %q not found", runID)
 		}
+		if run.RepoID != env.repo.ID {
+			return nil, fmt.Errorf("run %q belongs to a different repository", runID)
+		}
 		return run, nil
 	}
 	if branch != "" {

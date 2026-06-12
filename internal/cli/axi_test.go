@@ -426,3 +426,29 @@ func TestResolveActiveRunIgnoresOtherRepos(t *testing.T) {
 		t.Fatalf("resolved run = %#v, want nil (other repo's run must not leak)", got)
 	}
 }
+
+func TestResolveActiveRunRejectsExplicitRunFromOtherRepo(t *testing.T) {
+	database := openTestDB(t)
+	repo, err := database.InsertRepo(t.TempDir(), "origin", "main")
+	if err != nil {
+		t.Fatalf("insert repo: %v", err)
+	}
+	other, err := database.InsertRepo(t.TempDir(), "origin", "main")
+	if err != nil {
+		t.Fatalf("insert other repo: %v", err)
+	}
+	foreign, err := database.InsertRun(other.ID, "feature/elsewhere", "head", "base")
+	if err != nil {
+		t.Fatalf("insert other-repo run: %v", err)
+	}
+
+	// An explicit --run must stay scoped to the current repo: respond drives a
+	// pipeline, so an ID from another repo must not resolve and act there.
+	got, err := resolveActiveRun(&axiEnv{d: database, repo: repo}, foreign.ID, "")
+	if err == nil {
+		t.Fatalf("resolved run = %#v, want error for foreign-repo run %s", got, foreign.ID)
+	}
+	if got != nil {
+		t.Fatalf("resolved run = %#v, want nil for foreign-repo run", got)
+	}
+}
