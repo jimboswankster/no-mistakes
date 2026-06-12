@@ -100,7 +100,10 @@ no-mistakes axi respond --action skip
 | `--findings` | `string` | (none) | Comma-separated finding IDs for `--action fix` |
 | `--instructions` | `string` | (none) | Guidance applied to selected findings |
 | `--add-finding` | `string` | (none) | JSON finding object to add and fix |
+| `--run` | `string` | branch's active run | Respond to a specific run ID in the current repo |
 | `-y`, `--yes` | `bool` | `false` | Auto-resolve every subsequent gate until a decision point or outcome |
+
+By default `axi respond` targets the active run on the current branch. Because the pipeline is non-blocking, by the time a gate needs an answer you may have switched branches or detached HEAD; when no run matches the current branch it falls back to the repo's only active run. If several runs are active in the repo and none is on the current branch, pass `--run <id>` to choose one. A `--run` ID from another repository is rejected.
 
 After the explicit response, `--yes` uses the same auto-resolution behavior as `axi run --yes`: have the pipeline fix `auto-fix` and `ask-user` findings once, approve the fix review, approve gates that only contain non-actionable `no-op` findings, and stop at `outcome: checks-passed` when CI is green but the PR still needs a human merge.
 The same successful-output reporting instructions apply to `axi respond` results.
@@ -116,7 +119,7 @@ no-mistakes axi status --run <id>
 
 | Flag | Type | Default | Description |
 |---|---|---|---|
-| `--run` | `string` | active or most recent | Inspect a specific run ID |
+| `--run` | `string` | active or most recent | Inspect a specific run ID in the current repo |
 
 ## no-mistakes axi logs
 
@@ -131,7 +134,7 @@ no-mistakes axi logs --step review --run <id>
 | Flag | Type | Default | Description |
 |---|---|---|---|
 | `--step` | `string` | (none) | Step name; required |
-| `--run` | `string` | active or most recent | Run ID to inspect |
+| `--run` | `string` | active or most recent | Run ID in the current repo to inspect |
 | `--full` | `bool` | `false` | Show the entire log instead of the tail |
 
 Without `--full`, long logs show the last 40 lines and a help hint for the full log.

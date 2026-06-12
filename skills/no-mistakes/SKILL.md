@@ -118,13 +118,17 @@ Run the pipeline and decide on its findings as they come up:
 
     Each `respond` blocks until the next `gate:`, `checks-passed` decision point, or final outcome.
 
-    Two extra flags are available on `respond` when you need them:
+    Three extra flags are available on `respond` when you need them:
     - `--add-finding '<json>'` (with `--action fix`) folds a finding you
       spotted yourself - one the pipeline did not surface - into the fix round,
       as a JSON finding object. Use it for a problem you noticed that is not in
       the gate's own `findings` table.
     - `--step <name>` responds to a specific step instead of the one currently
       awaiting approval. You rarely need this; omit it to answer the active gate.
+    - `--run <id>` answers a specific run. respond targets the current
+      branch's active run and otherwise the repo's only active run, so it keeps
+      working after you switch branches; pass `--run` only when respond
+      reports several active runs and asks you to choose one.
 3. Repeat step 2 until the output has an `outcome:` instead of a `gate:`. The
    outcomes are:
    - `checks-passed` - the change is validated and CI is green, but the PR is
