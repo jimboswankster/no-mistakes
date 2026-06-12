@@ -195,6 +195,9 @@ func resolveRun(env *axiEnv, runID, branch string) (*db.Run, error) {
 		if err != nil {
 			return nil, fmt.Errorf("get run: %w", err)
 		}
+		if run != nil && run.RepoID != env.repo.ID {
+			return nil, fmt.Errorf("run %q belongs to a different repository", runID)
+		}
 		return run, nil
 	}
 	if branch != "" {
